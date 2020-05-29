@@ -1,0 +1,25 @@
+-- 黑桃日志监控告警系统
+定义：基于不同的系统日志进行监控，根据每个系统自定义的关键字出发警告规则，匹配到规则立即发出警告。
+警告可分为： 短信，邮件等方式
+
+技术架构： flume+kafka+storm+redis+mysql
+flume -->  对日志信息进行采集，并将信息下沉到kafka的log-monitor这个topic中。
+kafka -->  消息队列，创建topic(log-monitor)存放事实的日志消息。
+storm -->  实时处理框架，利用KafkaSpout消费kafka中的数据，发射到业务处理的bolt中进行处理。
+redis -->  缓存数据库，业务处理获取缓存中的规则信息进行业务逻辑判断。
+mysql -->  数据库，存放JavaWeb项目中配置的出发规则
+------------->  规则匹配的业务定时更新MySQL的规则信息到redis中。
+
+数据处理流程：  （假设：JavaWeb项目已经给各个系统配置好出发规则 --> MySQL中有数据）
+	1、现有一个系统（订单系统），对系统的日志进行采集，通过日志采集插件（flume）进行数据采集。
+	2、通过flume采集的数据存放到kafka中   flume2kafka
+	3、Storm消费Kafka的数据  kafka2storm
+	4、Storm操作redis保存结果 storm2redis
+	
+
+程序实现：
+	1、KafkaSpout获取kafka集群中的log-monitor topic的信息
+	2、FilterBolt对一行一行的日志进行过滤---规则校验 
+	3、NotifyBolt触发规则之后，发短信，发邮件
+	4、Save2MysqlBolt管理平台的数据展示
+
