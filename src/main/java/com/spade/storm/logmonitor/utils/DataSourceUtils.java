@@ -31,7 +31,7 @@ public class DataSourceUtils {
             in = DataSourceUtils.class.getResourceAsStream("/data-source.properties");
             properties.load(in);
         } catch (FileNotFoundException e) {
-            logger.error("jdbc.properties文件未找到");
+            logger.error("data-source.properties文件未找到");
         } catch (IOException e) {
             logger.error("出现IOException");
         } finally {
@@ -40,7 +40,7 @@ public class DataSourceUtils {
                     in.close();
                 }
             } catch (IOException e) {
-                logger.error("jdbc.properties文件流关闭出现异常");
+                logger.error("data-source.properties文件流关闭出现异常");
             }
         }
         ds.configFromPropety(properties);
